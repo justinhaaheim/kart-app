@@ -1,7 +1,7 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
 import CssBaseline from '@mui/material/CssBaseline';
 
 // Import MUI default Roboto font
@@ -15,4 +15,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <CssBaseline enableColorScheme />
     <App />
   </React.StrictMode>,
-)
+);
