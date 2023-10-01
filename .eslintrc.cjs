@@ -32,7 +32,8 @@ module.exports = {
      */
     {
       extends: [
-        'plugin:@typescript-eslint/recommended',
+        // We can't use this here because it conflicts with react-app, but that's OK because react-app includes sensible defaults
+        // 'plugin:@typescript-eslint/recommended',
         'plugin:import/typescript',
         // prettier turns OFF rules that are unnecessary or might conflict with prettier
         'prettier',
@@ -42,11 +43,11 @@ module.exports = {
 
       parser: '@typescript-eslint/parser',
 
-      parserOptions: {
-        ecmaVersion: 'latest',
-        project: './tsconfig.json',
-        sourceType: 'module',
-      },
+      // parserOptions: {
+      //   ecmaVersion: 'latest',
+      //   project: './tsconfig.json',
+      //   sourceType: 'module',
+      // },
 
       plugins: ['typescript-sort-keys'],
 
