@@ -51,23 +51,25 @@ module.exports = {
       plugins: ['typescript-sort-keys'],
 
       rules: {
-        '@typescript-eslint/consistent-type-imports': [
-          WARN,
-          {prefer: 'type-imports'},
-        ],
-        '@typescript-eslint/no-inferrable-types': WARN,
-        '@typescript-eslint/no-unused-vars': NO_UNUSED_VARS_CONFIG,
-        '@typescript-eslint/no-var-requires': WARN,
-        '@typescript-eslint/sort-type-union-intersection-members': WARN,
-        'typescript-sort-keys/interface': WARN,
-        'typescript-sort-keys/string-enum': WARN,
-
         '@typescript-eslint/ban-ts-comment': [
           WARN,
           {
             'ts-ignore': 'allow-with-description',
           },
         ],
+
+        '@typescript-eslint/consistent-type-imports': [
+          WARN,
+          {prefer: 'type-imports'},
+        ],
+
+        '@typescript-eslint/no-inferrable-types': WARN,
+
+        '@typescript-eslint/no-unused-vars': NO_UNUSED_VARS_CONFIG,
+
+        '@typescript-eslint/no-var-requires': WARN,
+
+        '@typescript-eslint/sort-type-union-intersection-members': WARN,
 
         // (This helps configure simple-import-sort) Make sure all imports are at the top of the file
         'import/first': ERROR,
@@ -86,6 +88,10 @@ module.exports = {
             ],
           },
         ],
+
+        'typescript-sort-keys/interface': WARN,
+
+        'typescript-sort-keys/string-enum': WARN,
       },
     },
   ],
@@ -96,12 +102,6 @@ module.exports = {
   root: true,
 
   rules: {
-    'react-hooks/exhaustive-deps': ERROR,
-
-    'react-refresh/only-export-components': [WARN, {allowConstantExport: true}],
-
-    'react/jsx-sort-props': WARN,
-
     // (This helps configure simple-import-sort) Make sure all imports are at the top of the file
     'import/first': ERROR,
 
@@ -120,6 +120,12 @@ module.exports = {
     'no-unused-vars': NO_UNUSED_VARS_CONFIG,
 
     quotes: [ERROR, 'single', {allowTemplateLiterals: true, avoidEscape: true}],
+
+    'react-hooks/exhaustive-deps': ERROR,
+
+    'react-refresh/only-export-components': [WARN, {allowConstantExport: true}],
+
+    'react/jsx-sort-props': WARN,
 
     // This sorts re-exports (`export * from 'foo';`), but not other types of exports.
     'simple-import-sort/exports': ERROR,
