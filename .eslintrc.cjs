@@ -43,6 +43,7 @@ module.exports = {
 
       parser: '@typescript-eslint/parser',
 
+      // I don't think this needs to be explicitly specified. Doing so causes an error when linting vite.config.ts
       // parserOptions: {
       //   ecmaVersion: 'latest',
       //   project: './tsconfig.json',
