@@ -23,15 +23,20 @@ const SLOT_SIZE_PX = 140;
 const SLOT_MARGIN_PX = 10;
 const SLOT_CONTAINER_SIZE_PX = SLOT_SIZE_PX + SLOT_MARGIN_PX * 2;
 
-const ROUNDS_BEFORE_FINAL_RESULT = 10;
+const ROUNDS_BEFORE_FINAL_RESULT = 15;
+const ANIMATION_DURATION_S = 4;
+
+// const BEZIER_CURVE = 'cubic-bezier(.09,.41,1,.96)';
+// const BEZIER_CURVE = 'cubic-bezier(.02,.99,.97,.89)';
+// const BEZIER_CURVE = 'cubic-bezier(.31,1.1,.97,.89)';
+const BEZIER_CURVE = 'cubic-bezier(.31,1.1,.98,.95)';
 
 const lightTheme = getTheme({mode: 'light'});
-console.log('lightTheme', lightTheme);
 
 type Status = 'ended' | 'ready' | 'transitioning';
 
 export default function Slot({label, options, selectedIndex}: Props) {
-  const [status, setStatus] = useState<Status>('ready');
+  const [_status, setStatus] = useState<Status>('ready');
   const tallBoxRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -50,6 +55,9 @@ export default function Slot({label, options, selectedIndex}: Props) {
         );
         tallBoxPointer?.removeEventListener('transitionend', onTransitionEnd);
       };
+    } else {
+      console.error('tallBoxRef.current is null');
+      return;
     }
   }, []);
 
@@ -59,7 +67,7 @@ export default function Slot({label, options, selectedIndex}: Props) {
         <Paper
           sx={{
             height: getPx(SLOT_CONTAINER_SIZE_PX),
-            // overflow: 'hidden',
+            overflow: 'hidden',
             padding: getPx(SLOT_MARGIN_PX),
             width: getPx(SLOT_CONTAINER_SIZE_PX),
           }}
@@ -77,7 +85,10 @@ export default function Slot({label, options, selectedIndex}: Props) {
                         ROUNDS_BEFORE_FINAL_RESULT +
                       selectedIndex * SLOT_SIZE_PX
                     }px)`,
-              transition: 'transform 1s cubic-bezier(0,1.24,.91,.89)',
+              transition:
+                selectedIndex != null
+                  ? `transform ${ANIMATION_DURATION_S}s ${BEZIER_CURVE}`
+                  : 'none',
             }}>
             {Array.from({length: ROUNDS_BEFORE_FINAL_RESULT + 1})
               .fill(options)
@@ -87,16 +98,29 @@ export default function Slot({label, options, selectedIndex}: Props) {
                   key={index}
                   sx={{
                     alignItems: 'center',
+
                     backgroundColor:
                       index % 2 === 0 ? 'primary.main' : 'secondary.main',
+
                     display: 'flex',
-                    filter:
-                      status === 'transitioning' ? 'blur(3px)' : 'blur(0)',
+                    // filter: selectedIndex != null ? 'blur(3px)' : 'blur(0)',
                     height: getPx(SLOT_SIZE_PX),
+
                     justifyContent: 'center',
+
                     textAlign: 'center',
+                    // transition:
+                    //   selectedIndex != null
+                    //     ? `filter ${ANIMATION_DURATION_S} ${BEZIER_CURVE}`
+                    //     : 'none',
                     verticalAlign: 'middle',
                     width: getPx(SLOT_SIZE_PX),
+                    ...(selectedIndex != null
+                      ? {
+                          animationDuration: `${ANIMATION_DURATION_S}s`,
+                          animationName: 'slot-blur',
+                        }
+                      : {}),
                   }}>
                   <Typography component="div" variant="body1">
                     {option as string}
