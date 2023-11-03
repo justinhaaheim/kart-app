@@ -11,8 +11,9 @@ function App() {
       component="main"
       maxWidth="md"
       sx={{
-        mb: 5,
-        mt: 2,
+        margin: '0 auto',
+        // mb: 5,
+        // mt: 2,
       }}>
       <Paper sx={{margin: '0 auto', padding: 3}}>Some stuff</Paper>
     </Container>
