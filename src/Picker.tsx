@@ -45,6 +45,7 @@ export default function Picker() {
         <Box>
           <Button
             onClick={() => setCounter((prev) => prev + 1)}
+            size="large"
             variant="contained">
             Let's Go!
           </Button>

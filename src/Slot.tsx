@@ -38,7 +38,8 @@ const SLOT_INDEX_DELAY_S = 1;
 // const BEZIER_CURVE = 'cubic-bezier(.09,.41,1,.96)';
 // const BEZIER_CURVE = 'cubic-bezier(.02,.99,.97,.89)';
 // const BEZIER_CURVE = 'cubic-bezier(.31,1.1,.97,.89)';
-const BEZIER_CURVE = 'cubic-bezier(.31,1.1,.98,.95)';
+// const BEZIER_CURVE = 'cubic-bezier(.31,1.1,.98,.95)'; // I really like this one
+const BEZIER_CURVE = 'cubic-bezier(.31,1.1,.99,.98)'; // This one's even better!
 
 const lightTheme = getTheme({mode: 'light'});
 
