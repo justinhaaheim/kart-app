@@ -24,6 +24,7 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
   },
+  shape: {borderRadius: 12},
 });
 
 export default theme;
