@@ -27,12 +27,18 @@ export default function Picker() {
           <Stack direction="row" justifyContent="center" spacing={3}>
             <Slot
               label="Items"
-              options={ITEMS}
+              options={[
+                {emoji: '🙂', label: 'Normal', quantity: 2},
+                {emoji: '😳', label: 'Frantic', quantity: 1},
+              ]}
               selectedIndex={itemsSelectedIndex}
             />
             <Slot
               label="CPU"
-              options={['Normal', 'Hard']}
+              options={[
+                {emoji: '🙂', label: 'Normal', quantity: 2},
+                {emoji: '😳', label: 'Frantic', quantity: 1},
+              ]}
               selectedIndex={null}
             />
           </Stack>

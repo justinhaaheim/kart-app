@@ -9,9 +9,15 @@ import {useEffect, useRef, useState} from 'react';
 
 import getTheme from './getTheme';
 
+export type Item = {
+  emoji: string;
+  label: string;
+  quantity: number;
+};
+
 type Props = {
   label: string;
-  options: Array<React.ReactNode>;
+  options: Array<Item>;
   selectedIndex: number | null;
 };
 
@@ -61,13 +67,26 @@ export default function Slot({label, options, selectedIndex}: Props) {
     }
   }, []);
 
+  const optionsComponents = options
+    .map((option, index) => {
+      // Return an array of the number of items, and then flatten the resulting array
+      return Array.from({length: option.quantity}, () => {
+        return (
+          <Typography component="div" variant="body1">
+            {option.label}
+          </Typography>
+        );
+      });
+    })
+    .flat();
+
   return (
     <Stack spacing={0.5}>
       <ThemeProvider theme={lightTheme}>
         <Paper
           sx={{
             height: getPx(SLOT_CONTAINER_SIZE_PX),
-            overflow: 'hidden',
+            // overflow: 'hidden',
             padding: getPx(SLOT_MARGIN_PX),
             width: getPx(SLOT_CONTAINER_SIZE_PX),
           }}
@@ -81,7 +100,7 @@ export default function Slot({label, options, selectedIndex}: Props) {
                   ? 'translateY(0)'
                   : `translateY(-${
                       SLOT_SIZE_PX *
-                        options.length *
+                        optionsComponents.length *
                         ROUNDS_BEFORE_FINAL_RESULT +
                       selectedIndex * SLOT_SIZE_PX
                     }px)`,
@@ -91,7 +110,7 @@ export default function Slot({label, options, selectedIndex}: Props) {
                   : 'none',
             }}>
             {Array.from({length: ROUNDS_BEFORE_FINAL_RESULT + 1})
-              .fill(options)
+              .fill(optionsComponents)
               .flat()
               .map((option, index) => (
                 <Box
