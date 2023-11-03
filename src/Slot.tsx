@@ -20,45 +20,58 @@ const SLOT_SIZE_PX = 140;
 const SLOT_MARGIN_PX = 10;
 const SLOT_CONTAINER_SIZE_PX = SLOT_SIZE_PX + SLOT_MARGIN_PX * 2;
 
+const ROUNDS_BEFORE_FINAL_RESULT = 4;
+
 const lightTheme = getTheme({mode: 'light'});
 console.log('lightTheme', lightTheme);
 
 export default function Slot({label, options, selectedIndex}: Props) {
   return (
-    <ThemeProvider theme={lightTheme}>
-      <Stack spacing={0.5}>
+    <Stack spacing={0.5}>
+      <ThemeProvider theme={lightTheme}>
         <Paper
           sx={{
             display: 'block',
             height: getPx(SLOT_CONTAINER_SIZE_PX),
-            overflow: 'hidden',
+            // overflow: 'hidden',
             padding: getPx(SLOT_MARGIN_PX),
+            transform:
+              selectedIndex == null
+                ? 'translateY(0)'
+                : `translateY(-${
+                    SLOT_SIZE_PX * 2 * ROUNDS_BEFORE_FINAL_RESULT +
+                    selectedIndex * SLOT_SIZE_PX
+                  }px)`,
+            transition: 'transform 1s ease-in-out',
             width: getPx(SLOT_CONTAINER_SIZE_PX),
           }}
           variant="outlined">
-          {options.map((option, index) => (
-            <Box
-              key={index}
-              sx={{
-                alignItems: 'center',
-                border: '1px solid red',
-                display: 'flex',
-                height: getPx(SLOT_SIZE_PX),
-                justifyContent: 'center',
-                // padding: 2,
-                textAlign: 'center',
-                verticalAlign: 'middle',
-                width: getPx(SLOT_SIZE_PX),
-              }}>
-              <Typography component="div" variant="body1">
-                {option}
-              </Typography>
-            </Box>
-          ))}
+          {Array.from({length: ROUNDS_BEFORE_FINAL_RESULT + 1})
+            .fill(options)
+            .flat()
+            .map((option, index) => (
+              <Box
+                key={index}
+                sx={{
+                  alignItems: 'center',
+                  backgroundColor:
+                    index % 2 === 0 ? 'primary.main' : 'secondary.main',
+                  display: 'flex',
+                  height: getPx(SLOT_SIZE_PX),
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  verticalAlign: 'middle',
+                  width: getPx(SLOT_SIZE_PX),
+                }}>
+                <Typography component="div" variant="body1">
+                  {option as string}
+                </Typography>
+              </Box>
+            ))}
         </Paper>
+      </ThemeProvider>
 
-        <Typography variant="subtitle2">{label}</Typography>
-      </Stack>
-    </ThemeProvider>
+      <Typography variant="subtitle2">{label}</Typography>
+    </Stack>
   );
 }

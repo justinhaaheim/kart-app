@@ -4,10 +4,15 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import {useState} from 'react';
 
 import Slot from './Slot';
 
 export default function Picker() {
+  const [itemsSelectedIndex, setItemsSelectedIndex] = useState<number | null>(
+    null,
+  );
+
   return (
     <Paper sx={{padding: 3}}>
       <Stack spacing={3}>
@@ -29,7 +34,13 @@ export default function Picker() {
         </Box>
 
         <Box>
-          <Button variant="contained">Let's Go!</Button>
+          <Button
+            onClick={() =>
+              setItemsSelectedIndex((prev) => (prev === null ? 0 : null))
+            }
+            variant="contained">
+            Let's Go!
+          </Button>
         </Box>
       </Stack>
     </Paper>
