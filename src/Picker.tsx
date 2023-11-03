@@ -37,6 +37,7 @@ export default function Picker() {
                 {emoji: '😌', label: 'Normal', quantity: 3},
                 {emoji: '🤖', label: 'Hard', quantity: 1},
               ]}
+              playSound={true}
               slotIndex={1}
             />
           </Stack>

@@ -9,6 +9,7 @@ import _ from 'lodash';
 import {useEffect, useRef, useState} from 'react';
 
 import getTheme from './getTheme';
+import {playRouletteSound} from './soundPlayer';
 
 export type Item = {
   emoji: string;
@@ -20,6 +21,7 @@ type Props = {
   activated: boolean;
   label: string;
   options: Array<Item>;
+  playSound?: boolean;
   slotIndex: number;
 };
 
@@ -45,10 +47,17 @@ const lightTheme = getTheme({mode: 'light'});
 
 type Status = 'ended' | 'ready' | 'transitioning';
 
-export default function Slot({label, options, slotIndex, activated}: Props) {
+export default function Slot({
+  label,
+  options,
+  slotIndex,
+  activated,
+  playSound,
+}: Props) {
   const [_status, setStatus] = useState<Status>('ready');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const tallBoxRef = useRef<HTMLElement>(null);
+  const didPlaySoundRef = useRef<boolean>(false);
 
   const animationDurationAdjusted =
     ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S * slotIndex;
@@ -92,6 +101,13 @@ export default function Slot({label, options, slotIndex, activated}: Props) {
       setStatus('ready');
     }
   }, [activated, optionsComponents.length, selectedIndex]);
+
+  useEffect(() => {
+    if (playSound === true && activated && didPlaySoundRef.current === false) {
+      playRouletteSound(animationDurationAdjusted);
+      didPlaySoundRef.current = true;
+    }
+  }, [activated, animationDurationAdjusted, playSound]);
 
   useEffect(() => {
     if (tallBoxRef.current != null) {
