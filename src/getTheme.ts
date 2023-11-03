@@ -20,11 +20,19 @@ import {createTheme} from '@mui/material/styles';
 // const htmlFontSizeObject =
 //   htmlFontSize == null ? {} : {htmlFontSize: htmlFontSize};
 
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-  shape: {borderRadius: 12},
-});
+function getTheme({mode}: {mode: 'dark' | 'light'}) {
+  return createTheme({
+    palette: {
+      mode: mode,
+    },
+    shape: {borderRadius: 12},
+    typography: {
+      h1: {
+        fontSize: '4rem',
+      },
+      h2: {fontSize: '3rem'},
+    },
+  });
+}
 
-export default theme;
+export default getTheme;

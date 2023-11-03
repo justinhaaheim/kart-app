@@ -11,11 +11,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App.tsx';
-import theme from './theme';
+import getTheme from './getTheme.ts';
+
+const darkTheme = getTheme({mode: 'dark'});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={darkTheme}>
       <CssBaseline enableColorScheme />
       <App />
     </ThemeProvider>
