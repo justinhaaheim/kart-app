@@ -9,12 +9,8 @@ import {useState} from 'react';
 
 import Slot from './Slot';
 
-const ITEMS: Array<string> = (
-  Array.from({length: 2}).fill('Normal') as Array<string>
-).concat(['Frantic']);
-
 export default function Picker() {
-  const [activated, setActivated] = useState(false);
+  const [counter, setCounter] = useState(0);
 
   return (
     <Paper sx={{padding: 3}}>
@@ -24,7 +20,8 @@ export default function Picker() {
         <Box sx={{padding: 5}}>
           <Stack direction="row" justifyContent="center" spacing={3}>
             <Slot
-              activated={activated}
+              activated={counter !== 0}
+              key={`Items-${counter}`}
               label="Items"
               options={[
                 {emoji: '🙂', label: 'Normal', quantity: 2},
@@ -33,7 +30,8 @@ export default function Picker() {
               slotIndex={0}
             />
             <Slot
-              activated={activated}
+              activated={counter !== 0}
+              key={`CPU-${counter}`}
               label="CPU"
               options={[
                 {emoji: '😌', label: 'Normal', quantity: 3},
@@ -46,7 +44,7 @@ export default function Picker() {
 
         <Box>
           <Button
-            onClick={() => setActivated((prev) => !prev)}
+            onClick={() => setCounter((prev) => prev + 1)}
             variant="contained">
             Let's Go!
           </Button>

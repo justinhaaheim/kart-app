@@ -53,13 +53,18 @@ export default function Slot({label, options, slotIndex, activated}: Props) {
     ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S * slotIndex;
 
   const optionsComponents = options
-    .map((option, index) => {
+    .map((option, _index) => {
       // Return an array of the number of items, and then flatten the resulting array
       return Array.from({length: option.quantity}, () => {
         return (
-          <Typography component="div" variant="body1">
-            {option.label}
-          </Typography>
+          <Stack spacing={0.5}>
+            <Typography component="div" variant="h2">
+              {option.emoji}
+            </Typography>
+            <Typography component="div" variant="h6">
+              {option.label}
+            </Typography>
+          </Stack>
         );
       });
     })
@@ -139,8 +144,8 @@ export default function Slot({label, options, slotIndex, activated}: Props) {
                   sx={{
                     alignItems: 'center',
 
-                    backgroundColor:
-                      index % 2 === 0 ? 'primary.main' : 'secondary.main',
+                    // backgroundColor:
+                    //   index % 2 === 0 ? 'primary.main' : 'secondary.main',
 
                     display: 'flex',
                     // filter: selectedIndex != null ? 'blur(3px)' : 'blur(0)',
