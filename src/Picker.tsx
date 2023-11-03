@@ -14,9 +14,7 @@ const ITEMS: Array<string> = (
 ).concat(['Frantic']);
 
 export default function Picker() {
-  const [itemsSelectedIndex, setItemsSelectedIndex] = useState<number | null>(
-    null,
-  );
+  const [activated, setActivated] = useState(false);
 
   return (
     <Paper sx={{padding: 3}}>
@@ -26,31 +24,29 @@ export default function Picker() {
         <Box sx={{padding: 5}}>
           <Stack direction="row" justifyContent="center" spacing={3}>
             <Slot
+              activated={activated}
               label="Items"
               options={[
                 {emoji: '🙂', label: 'Normal', quantity: 2},
                 {emoji: '😳', label: 'Frantic', quantity: 1},
               ]}
-              selectedIndex={itemsSelectedIndex}
+              slotIndex={0}
             />
             <Slot
+              activated={activated}
               label="CPU"
               options={[
-                {emoji: '🙂', label: 'Normal', quantity: 2},
-                {emoji: '😳', label: 'Frantic', quantity: 1},
+                {emoji: '😌', label: 'Normal', quantity: 3},
+                {emoji: '🤖', label: 'Hard', quantity: 1},
               ]}
-              selectedIndex={null}
+              slotIndex={1}
             />
           </Stack>
         </Box>
 
         <Box>
           <Button
-            onClick={() =>
-              setItemsSelectedIndex((prev) =>
-                prev === null ? _.random(0, ITEMS.length - 1) : null,
-              )
-            }
+            onClick={() => setActivated((prev) => !prev)}
             variant="contained">
             Let's Go!
           </Button>

@@ -5,6 +5,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import {ThemeProvider} from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import _ from 'lodash';
 import {useEffect, useRef, useState} from 'react';
 
 import getTheme from './getTheme';
@@ -16,9 +17,10 @@ export type Item = {
 };
 
 type Props = {
+  activated: boolean;
   label: string;
   options: Array<Item>;
-  selectedIndex: number | null;
+  slotIndex: number;
 };
 
 function getPx(value: number): string {
@@ -31,6 +33,7 @@ const SLOT_CONTAINER_SIZE_PX = SLOT_SIZE_PX + SLOT_MARGIN_PX * 2;
 
 const ROUNDS_BEFORE_FINAL_RESULT = 15;
 const ANIMATION_DURATION_S = 4;
+const SLOT_INDEX_DELAY_S = 1;
 
 // const BEZIER_CURVE = 'cubic-bezier(.09,.41,1,.96)';
 // const BEZIER_CURVE = 'cubic-bezier(.02,.99,.97,.89)';
@@ -41,9 +44,40 @@ const lightTheme = getTheme({mode: 'light'});
 
 type Status = 'ended' | 'ready' | 'transitioning';
 
-export default function Slot({label, options, selectedIndex}: Props) {
+export default function Slot({label, options, slotIndex, activated}: Props) {
   const [_status, setStatus] = useState<Status>('ready');
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const tallBoxRef = useRef<HTMLElement>(null);
+
+  const animationDurationAdjusted =
+    ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S * slotIndex;
+
+  const optionsComponents = options
+    .map((option, index) => {
+      // Return an array of the number of items, and then flatten the resulting array
+      return Array.from({length: option.quantity}, () => {
+        return (
+          <Typography component="div" variant="body1">
+            {option.label}
+          </Typography>
+        );
+      });
+    })
+    .flat();
+
+  // useEffect(() => {
+  //   console.log('status:', status);
+  // }, [status]);
+
+  useEffect(() => {
+    if (activated && selectedIndex == null) {
+      setSelectedIndex(_.random(0, optionsComponents.length - 1));
+    }
+    if (!activated && selectedIndex != null) {
+      setSelectedIndex(null);
+      setStatus('ready');
+    }
+  }, [activated, optionsComponents.length, selectedIndex]);
 
   useEffect(() => {
     if (tallBoxRef.current != null) {
@@ -67,26 +101,13 @@ export default function Slot({label, options, selectedIndex}: Props) {
     }
   }, []);
 
-  const optionsComponents = options
-    .map((option, index) => {
-      // Return an array of the number of items, and then flatten the resulting array
-      return Array.from({length: option.quantity}, () => {
-        return (
-          <Typography component="div" variant="body1">
-            {option.label}
-          </Typography>
-        );
-      });
-    })
-    .flat();
-
   return (
     <Stack spacing={0.5}>
       <ThemeProvider theme={lightTheme}>
         <Paper
           sx={{
             height: getPx(SLOT_CONTAINER_SIZE_PX),
-            // overflow: 'hidden',
+            overflow: 'hidden',
             padding: getPx(SLOT_MARGIN_PX),
             width: getPx(SLOT_CONTAINER_SIZE_PX),
           }}
@@ -96,17 +117,17 @@ export default function Slot({label, options, selectedIndex}: Props) {
             sx={{
               display: 'block',
               transform:
-                selectedIndex == null
-                  ? 'translateY(0)'
-                  : `translateY(-${
+                selectedIndex != null
+                  ? `translateY(-${
                       SLOT_SIZE_PX *
                         optionsComponents.length *
                         ROUNDS_BEFORE_FINAL_RESULT +
                       selectedIndex * SLOT_SIZE_PX
-                    }px)`,
+                    }px)`
+                  : 'translateY(0)',
               transition:
                 selectedIndex != null
-                  ? `transform ${ANIMATION_DURATION_S}s ${BEZIER_CURVE}`
+                  ? `transform ${animationDurationAdjusted}s ${BEZIER_CURVE}`
                   : 'none',
             }}>
             {Array.from({length: ROUNDS_BEFORE_FINAL_RESULT + 1})
@@ -136,7 +157,7 @@ export default function Slot({label, options, selectedIndex}: Props) {
                     width: getPx(SLOT_SIZE_PX),
                     ...(selectedIndex != null
                       ? {
-                          animationDuration: `${ANIMATION_DURATION_S}s`,
+                          animationDuration: `${animationDurationAdjusted}s`,
                           animationName: 'slot-blur',
                         }
                       : {}),
