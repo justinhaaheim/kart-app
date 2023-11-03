@@ -52,7 +52,7 @@ export default function Slot({label, options, slotIndex, activated}: Props) {
   const animationDurationAdjusted =
     ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S * slotIndex;
 
-  const optionsComponents = options
+  const optionsComponentsUncut = options
     .map((option, _index) => {
       // Return an array of the number of items, and then flatten the resulting array
       return Array.from({length: option.quantity}, () => {
@@ -69,6 +69,14 @@ export default function Slot({label, options, slotIndex, activated}: Props) {
       });
     })
     .flat();
+
+  const startingItemIndexRef = useRef<number>(
+    _.random(0, optionsComponentsUncut.length - 1),
+  );
+
+  const optionsComponents = optionsComponentsUncut
+    .slice(startingItemIndexRef.current)
+    .concat(optionsComponentsUncut.slice(0, startingItemIndexRef.current));
 
   // useEffect(() => {
   //   console.log('status:', status);
