@@ -23,7 +23,7 @@ export default function Picker() {
             <Slot
               label="Items"
               options={['Normal', 'Frantic']}
-              selectedIndex={null}
+              selectedIndex={itemsSelectedIndex}
             />
             <Slot
               label="CPU"

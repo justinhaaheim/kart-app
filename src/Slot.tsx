@@ -20,7 +20,7 @@ const SLOT_SIZE_PX = 140;
 const SLOT_MARGIN_PX = 10;
 const SLOT_CONTAINER_SIZE_PX = SLOT_SIZE_PX + SLOT_MARGIN_PX * 2;
 
-const ROUNDS_BEFORE_FINAL_RESULT = 4;
+const ROUNDS_BEFORE_FINAL_RESULT = 10;
 
 const lightTheme = getTheme({mode: 'light'});
 console.log('lightTheme', lightTheme);
