@@ -48,7 +48,7 @@ export default function Picker() {
             onClick={() => setCounter((prev) => prev + 1)}
             size="large"
             variant="contained">
-            Let's Go!
+            Let's-a-go!
           </Button>
         </Box>
       </Stack>
