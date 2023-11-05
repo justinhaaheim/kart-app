@@ -13,6 +13,7 @@ import {playRouletteSound} from './soundPlayer';
 
 export type Item = {
   emoji: string;
+  imageSrc: string;
   label: string;
   quantity: number;
 };
@@ -68,9 +69,15 @@ export default function Slot({
       return Array.from({length: option.quantity}, () => {
         return (
           <Stack spacing={0.5}>
-            <Typography component="div" variant="h2">
-              {option.emoji}
-            </Typography>
+            <img
+              alt={option.label}
+              src={option.imageSrc}
+              style={{
+                // border: '1px solid red',
+                maxHeight: '75px',
+                // maxWidth: '75px',
+              }}
+            />
             <Typography component="div" variant="h6">
               {option.label}
             </Typography>
@@ -201,7 +208,7 @@ export default function Slot({
         </Paper>
       </ThemeProvider>
 
-      <Typography variant="subtitle2">{label}</Typography>
+      <Typography variant="h6">{label}</Typography>
     </Stack>
   );
 }

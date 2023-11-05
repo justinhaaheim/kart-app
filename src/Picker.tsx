@@ -7,6 +7,10 @@ import Typography from '@mui/material/Typography';
 import _ from 'lodash';
 import {useState} from 'react';
 
+import blueShell from './assets/blueShell.png';
+import greenShell from './assets/greenShell.png';
+import mario from './assets/mario.png';
+import wario from './assets/wario.webp';
 import Slot from './Slot';
 
 export default function Picker() {
@@ -24,8 +28,18 @@ export default function Picker() {
               key={`Items-${counter}`}
               label="Items"
               options={[
-                {emoji: '🙂', label: 'Normal', quantity: 2},
-                {emoji: '😳', label: 'Frantic', quantity: 1},
+                {
+                  emoji: '🙂',
+                  imageSrc: greenShell,
+                  label: 'Normal',
+                  quantity: 2,
+                },
+                {
+                  emoji: '😳',
+                  imageSrc: blueShell,
+                  label: 'Frantic',
+                  quantity: 1,
+                },
               ]}
               slotIndex={0}
             />
@@ -34,8 +48,8 @@ export default function Picker() {
               key={`CPU-${counter}`}
               label="CPU"
               options={[
-                {emoji: '😌', label: 'Normal', quantity: 3},
-                {emoji: '🤖', label: 'Hard', quantity: 1},
+                {emoji: '😌', imageSrc: mario, label: 'Normal', quantity: 3},
+                {emoji: '🤖', imageSrc: wario, label: 'Hard', quantity: 1},
               ]}
               playSound={true}
               slotIndex={1}
