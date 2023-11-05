@@ -8,8 +8,10 @@ import r7 from './assets/SE_SYS_CourseSelectRoulette7.wav';
 import r8 from './assets/SE_SYS_CourseSelectRoulette8.wav';
 import rDecide from './assets/SE_SYS_CourseSelectRouletteDecide.wav';
 
-const SHORT_DELAY_MS = 100;
-const LONG_DELAY_MS = 300;
+// One full cycle of the 8 notes is ~0.946 seconds
+// So the delay between each is 0.946 / 8 = 0.11825 seconds
+const SHORT_DELAY_MS = 92;
+const LONG_DELAY_MS = 356;
 
 const FINAL_DELAY_MS = 1000;
 const SLOWER_SECTION_DURATION_MS = 2600;
