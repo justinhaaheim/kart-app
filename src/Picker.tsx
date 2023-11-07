@@ -24,7 +24,7 @@ export default function Picker() {
   const stopSoundsRef = useRef<() => void>();
 
   return (
-    <Paper sx={{padding: 3}}>
+    <Paper sx={{paddingX: 3, paddingY: 5}}>
       <Stack spacing={3}>
         <Typography variant="h2">The Kart App</Typography>
 
@@ -77,6 +77,7 @@ export default function Picker() {
               stopSoundsRef.current = stop;
             }}
             size="large"
+            sx={{border: '5px solid #fafafa', borderRadius: 1000}}
             variant="contained">
             Let's-a-go!
           </Button>
