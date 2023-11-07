@@ -24,10 +24,16 @@ const rouletteSoundUrls = [r1, r2, r3, r4, r5, r6, r7, r8];
 
 // I should probably do this after the page loads, but "I'm lazy", according to github copilot
 const audioContext = new AudioContext();
-const rouletteSoundsBuffers = await Promise.all(
-  rouletteSoundUrls.map(async (url) => getAudioBuffer(audioContext, url)),
-);
-const rouletteEndSoundBuffer = await getAudioBuffer(audioContext, rDecide);
+let rouletteSoundsBuffers: AudioBuffer[] | null = null;
+let rouletteEndSoundBuffer: AudioBuffer | null = null;
+
+(async () => {
+  rouletteSoundsBuffers = await Promise.all(
+    rouletteSoundUrls.map(async (url) => getAudioBuffer(audioContext, url)),
+  );
+  rouletteEndSoundBuffer = await getAudioBuffer(audioContext, rDecide);
+  console.log('Sounds loaded');
+})();
 
 async function getAudioBuffer(
   audioContext: AudioContext,
@@ -69,15 +75,19 @@ async function playSoundsWithDelay(
   Array.from({length: soundsToPlayCount}).forEach((_, i) => {
     const timeFromNowMs = offsetMs + i * delayMs;
 
-    const bufferNode = new AudioBufferSourceNode(audioContext, {
-      buffer:
-        rouletteSoundsBuffers[
-          counterRef.current % rouletteSoundsBuffers.length
-        ],
-    });
-    nodesScheduled.push(bufferNode);
-    scheduleBufferAtTime({audioContext, bufferNode, timeFromNowMs});
-    counterRef.current += 1;
+    if (rouletteSoundsBuffers != null) {
+      const bufferNode = new AudioBufferSourceNode(audioContext, {
+        buffer:
+          rouletteSoundsBuffers[
+            counterRef.current % rouletteSoundsBuffers.length
+          ],
+      });
+      nodesScheduled.push(bufferNode);
+      scheduleBufferAtTime({audioContext, bufferNode, timeFromNowMs});
+      counterRef.current += 1;
+    } else {
+      console.error('rouletteSoundsBuffers is null');
+    }
   });
 
   return {stop: () => nodesScheduled.forEach((node) => node.stop())};
@@ -86,6 +96,11 @@ async function playSoundsWithDelay(
 export async function playRouletteSound(
   durationSeconds: number,
 ): Promise<PlayerWithStop> {
+  if (audioContext.state === 'suspended') {
+    console.log('Resuming audio context.');
+    await audioContext.resume();
+  }
+
   const durationMs = durationSeconds * 1000;
 
   const counterRef = {current: 0};
