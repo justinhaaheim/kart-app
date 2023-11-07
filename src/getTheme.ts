@@ -20,10 +20,22 @@ import {createTheme} from '@mui/material/styles';
 // const htmlFontSizeObject =
 //   htmlFontSize == null ? {} : {htmlFontSize: htmlFontSize};
 
+const MARIO_KART_BUTTON_YELLOW = '#DBA906';
+
 function getTheme({mode}: {mode: 'dark' | 'light'}) {
   return createTheme({
     palette: {
+      background: {default: mode === 'light' ? '#F6F6F6' : undefined},
       mode: mode,
+      primary: {
+        // contrastText: '#242105',
+        // dark: '#A29415',
+        // light: '#E9DB5D',
+        // main: '#E3D026',
+        // dark: MARIO_KART_BUTTON_YELLOW,
+        // light: MARIO_KART_BUTTON_YELLOW,
+        main: MARIO_KART_BUTTON_YELLOW,
+      },
     },
     shape: {borderRadius: 12},
     typography: {

@@ -5,19 +5,26 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import _ from 'lodash';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 
 import blueShell from './assets/blueShell.png';
 import greenShell from './assets/greenShell.png';
 import mario from './assets/mario.png';
 import wario from './assets/wario.webp';
 import Slot from './Slot';
+import {playRouletteSound} from './soundPlayer';
+
+const BASE_ANIMATION_DURATION_S = 4;
+
+// How much longer each successive slot animation should take
+const SLOT_INDEX_DELAY_S = 1;
 
 export default function Picker() {
   const [counter, setCounter] = useState(0);
+  const stopSoundsRef = useRef<() => void>();
 
   return (
-    <Paper sx={{padding: 3}}>
+    <Paper sx={{paddingX: 3, paddingY: 5}}>
       <Stack spacing={3}>
         <Typography variant="h2">The Kart App</Typography>
 
@@ -25,6 +32,7 @@ export default function Picker() {
           <Stack direction="row" justifyContent="center" spacing={3}>
             <Slot
               activated={counter !== 0}
+              animationDuration={BASE_ANIMATION_DURATION_S}
               key={`Items-${counter}`}
               label="Items"
               options={[
@@ -41,26 +49,35 @@ export default function Picker() {
                   quantity: 1,
                 },
               ]}
-              slotIndex={0}
             />
+
             <Slot
               activated={counter !== 0}
+              animationDuration={BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S}
               key={`CPU-${counter}`}
               label="CPU"
               options={[
                 {emoji: '😌', imageSrc: mario, label: 'Normal', quantity: 3},
                 {emoji: '🤖', imageSrc: wario, label: 'Hard', quantity: 1},
               ]}
-              playSound={true}
-              slotIndex={1}
             />
           </Stack>
         </Box>
 
         <Box>
           <Button
-            onClick={() => setCounter((prev) => prev + 1)}
+            onClick={async () => {
+              setCounter((prev) => prev + 1);
+              if (stopSoundsRef.current != null) {
+                stopSoundsRef.current();
+              }
+              const {stop} = await playRouletteSound(
+                BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S,
+              );
+              stopSoundsRef.current = stop;
+            }}
             size="large"
+            sx={{border: '5px solid #fafafa', borderRadius: 1000}}
             variant="contained">
             Let's-a-go!
           </Button>
