@@ -8,6 +8,10 @@ import r7 from './assets/SE_SYS_CourseSelectRoulette7.wav';
 import r8 from './assets/SE_SYS_CourseSelectRoulette8.wav';
 import rDecide from './assets/SE_SYS_CourseSelectRouletteDecide.wav';
 
+type PlayerWithStop = {
+  stop: () => void;
+};
+
 // One full cycle of the 8 notes is ~0.946 seconds
 // So the delay between each is 0.946 / 8 = 0.11825 seconds
 const SHORT_DELAY_MS = 92;
@@ -43,7 +47,7 @@ function scheduleBufferAtTime({
   audioContext: AudioContext;
   bufferNode: AudioBufferSourceNode;
   timeFromNowMs: number;
-}) {
+}): void {
   const scheduledTime = audioContext.currentTime + timeFromNowMs / 1000;
   // console.log(
   //   `Scheduling sound ${timeFromNowMs}ms from now at ${scheduledTime}`,
@@ -58,8 +62,9 @@ async function playSoundsWithDelay(
   offsetMs: number,
   audioContext: AudioContext,
   counterRef: {current: number},
-) {
+): Promise<PlayerWithStop> {
   const soundsToPlayCount = Math.floor(duration / delayMs);
+  const nodesScheduled: Array<AudioBufferSourceNode> = [];
 
   Array.from({length: soundsToPlayCount}).forEach((_, i) => {
     const timeFromNowMs = offsetMs + i * delayMs;
@@ -70,12 +75,17 @@ async function playSoundsWithDelay(
           counterRef.current % rouletteSoundsBuffers.length
         ],
     });
+    nodesScheduled.push(bufferNode);
     scheduleBufferAtTime({audioContext, bufferNode, timeFromNowMs});
     counterRef.current += 1;
   });
+
+  return {stop: () => nodesScheduled.forEach((node) => node.stop())};
 }
 
-export async function playRouletteSound(durationSeconds: number) {
+export async function playRouletteSound(
+  durationSeconds: number,
+): Promise<PlayerWithStop> {
   const durationMs = durationSeconds * 1000;
 
   const counterRef = {current: 0};
@@ -83,7 +93,7 @@ export async function playRouletteSound(durationSeconds: number) {
   const fastSoundsDuration =
     durationMs - SLOWER_SECTION_DURATION_MS - FINAL_DELAY_MS;
 
-  await playSoundsWithDelay(
+  const {stop: stopFast} = await playSoundsWithDelay(
     SHORT_DELAY_MS,
     fastSoundsDuration,
     0,
@@ -91,7 +101,7 @@ export async function playRouletteSound(durationSeconds: number) {
     counterRef,
   );
 
-  await playSoundsWithDelay(
+  const {stop: stopSlower} = await playSoundsWithDelay(
     LONG_DELAY_MS,
     SLOWER_SECTION_DURATION_MS,
     fastSoundsDuration,
@@ -110,4 +120,12 @@ export async function playRouletteSound(durationSeconds: number) {
     bufferNode: rouletteEndSoundBufferNode,
     timeFromNowMs: durationMs,
   });
+
+  return {
+    stop: () => {
+      stopFast();
+      stopSlower();
+      rouletteEndSoundBufferNode.stop();
+    },
+  };
 }

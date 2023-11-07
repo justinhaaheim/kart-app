@@ -12,6 +12,12 @@ import greenShell from './assets/greenShell.png';
 import mario from './assets/mario.png';
 import wario from './assets/wario.webp';
 import Slot from './Slot';
+import {playRouletteSound} from './soundPlayer';
+
+const BASE_ANIMATION_DURATION_S = 4;
+
+// How much longer each successive slot animation should talk
+const SLOT_INDEX_DELAY_S = 1;
 
 export default function Picker() {
   const [counter, setCounter] = useState(0);
@@ -25,6 +31,7 @@ export default function Picker() {
           <Stack direction="row" justifyContent="center" spacing={3}>
             <Slot
               activated={counter !== 0}
+              animationDuration={BASE_ANIMATION_DURATION_S}
               key={`Items-${counter}`}
               label="Items"
               options={[
@@ -41,10 +48,10 @@ export default function Picker() {
                   quantity: 1,
                 },
               ]}
-              slotIndex={0}
             />
             <Slot
               activated={counter !== 0}
+              animationDuration={BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S}
               key={`CPU-${counter}`}
               label="CPU"
               options={[
@@ -52,14 +59,16 @@ export default function Picker() {
                 {emoji: '🤖', imageSrc: wario, label: 'Hard', quantity: 1},
               ]}
               playSound={true}
-              slotIndex={1}
             />
           </Stack>
         </Box>
 
         <Box>
           <Button
-            onClick={() => setCounter((prev) => prev + 1)}
+            onClick={() => {
+              setCounter((prev) => prev + 1);
+              playRouletteSound(BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S);
+            }}
             size="large"
             variant="contained">
             Let's-a-go!
