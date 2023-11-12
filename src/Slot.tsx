@@ -21,6 +21,7 @@ type Props = {
   activated: boolean;
   animationDuration: number;
   label: string;
+  onAnimationEnd?: () => void;
   options: Array<Item>;
 };
 
@@ -42,15 +43,16 @@ const BEZIER_CURVE = 'cubic-bezier(.31,1.1,.99,.98)'; // This one's even better!
 
 const lightTheme = getTheme({mode: 'light'});
 
-type Status = 'ended' | 'ready' | 'transitioning';
+type Status = 'ended' | 'ready' | 'transitioning' | 'unpainted';
 
 export default function Slot({
   label,
   animationDuration,
   options,
   activated,
+  onAnimationEnd,
 }: Props) {
-  const [_status, setStatus] = useState<Status>('ready');
+  const [status, setStatus] = useState<Status>('unpainted');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const tallBoxRef = useRef<HTMLElement>(null);
 
@@ -86,25 +88,38 @@ export default function Slot({
     .slice(startingItemIndexRef.current)
     .concat(optionsComponentsUncut.slice(0, startingItemIndexRef.current));
 
-  // useEffect(() => {
-  //   console.log('status:', status);
-  // }, [status]);
-
   useEffect(() => {
-    if (activated && selectedIndex == null) {
-      setSelectedIndex(_.random(0, optionsComponents.length - 1));
-    }
-    if (!activated && selectedIndex != null) {
-      setSelectedIndex(null);
+    if (activated && status === 'unpainted' && tallBoxRef.current != null) {
+      // This is for to force a repaint,
+      // which is necessary in order to transition styles when adding a class name.
+      // Otherwise on ios safari (and maybe other browsers) the initial
+      // translateY won't be set, and no scrolling animation will happen.
+      // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
+      tallBoxRef.current.scrollTop;
       setStatus('ready');
     }
-  }, [activated, optionsComponents.length, selectedIndex]);
+
+    if (activated && status === 'ready' && selectedIndex == null) {
+      setSelectedIndex(_.random(0, optionsComponents.length - 1));
+    }
+
+    // // Reset if we've already been activated before
+    // if (!activated && selectedIndex != null) {
+    //   setSelectedIndex(null);
+    //   setStatus('ready');
+    // }
+  }, [activated, optionsComponents.length, selectedIndex, status]);
 
   useEffect(() => {
     if (tallBoxRef.current != null) {
       const tallBoxPointer = tallBoxRef.current;
       const onTransitionStart = () => setStatus('transitioning');
-      const onTransitionEnd = () => setStatus('ended');
+      const onTransitionEnd = () => {
+        setStatus('ended');
+        if (onAnimationEnd != null) {
+          onAnimationEnd();
+        }
+      };
 
       tallBoxPointer.addEventListener('transitionstart', onTransitionStart);
       tallBoxPointer.addEventListener('transitionend', onTransitionEnd);
@@ -120,7 +135,7 @@ export default function Slot({
       console.error('tallBoxRef.current is null');
       return;
     }
-  }, []);
+  }, [onAnimationEnd]);
 
   return (
     <Stack spacing={0.5}>
