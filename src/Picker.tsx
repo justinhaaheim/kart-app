@@ -12,7 +12,7 @@ import greenShell from './assets/greenShell.png';
 import mario from './assets/mario.png';
 import wario from './assets/wario.webp';
 import Slot from './Slot';
-import {playRouletteSound} from './soundPlayer';
+import {playRouletteSoundSync} from './soundPlayer';
 
 const BASE_ANIMATION_DURATION_S = 4;
 
@@ -66,12 +66,12 @@ export default function Picker() {
 
         <Box>
           <Button
-            onClick={async () => {
+            onClick={() => {
               setCounter((prev) => prev + 1);
               if (stopSoundsRef.current != null) {
                 stopSoundsRef.current();
               }
-              const {stop} = await playRouletteSound(
+              const {stop} = playRouletteSoundSync(
                 BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S,
               );
               stopSoundsRef.current = stop;

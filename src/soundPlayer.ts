@@ -62,13 +62,13 @@ function scheduleBufferAtTime({
   bufferNode.start(timeFromNowMs === 0 ? undefined : scheduledTime);
 }
 
-async function playSoundsWithDelay(
+function playSoundsWithDelay(
   delayMs: number,
   duration: number,
   offsetMs: number,
   audioContext: AudioContext,
   counterRef: {current: number},
-): Promise<PlayerWithStop> {
+): PlayerWithStop {
   const soundsToPlayCount = Math.floor(duration / delayMs);
   const nodesScheduled: Array<AudioBufferSourceNode> = [];
 
@@ -108,7 +108,7 @@ export async function playRouletteSound(
   const fastSoundsDuration =
     durationMs - SLOWER_SECTION_DURATION_MS - FINAL_DELAY_MS;
 
-  const {stop: stopFast} = await playSoundsWithDelay(
+  const {stop: stopFast} = playSoundsWithDelay(
     SHORT_DELAY_MS,
     fastSoundsDuration,
     0,
@@ -116,7 +116,57 @@ export async function playRouletteSound(
     counterRef,
   );
 
-  const {stop: stopSlower} = await playSoundsWithDelay(
+  const {stop: stopSlower} = playSoundsWithDelay(
+    LONG_DELAY_MS,
+    SLOWER_SECTION_DURATION_MS,
+    fastSoundsDuration,
+    audioContext,
+    counterRef,
+  );
+
+  const rouletteEndSoundBufferNode = new AudioBufferSourceNode(audioContext, {
+    buffer: rouletteEndSoundBuffer,
+  });
+
+  // The final sound should be played right *on* the durationSeconds provided, not before
+
+  scheduleBufferAtTime({
+    audioContext,
+    bufferNode: rouletteEndSoundBufferNode,
+    timeFromNowMs: durationMs,
+  });
+
+  return {
+    stop: () => {
+      stopFast();
+      stopSlower();
+      rouletteEndSoundBufferNode.stop();
+    },
+  };
+}
+
+export function playRouletteSoundSync(durationSeconds: number): PlayerWithStop {
+  if (audioContext.state === 'suspended') {
+    console.log('Resuming audio context, but not awaiting.');
+    audioContext.resume();
+  }
+
+  const durationMs = durationSeconds * 1000;
+
+  const counterRef = {current: 0};
+
+  const fastSoundsDuration =
+    durationMs - SLOWER_SECTION_DURATION_MS - FINAL_DELAY_MS;
+
+  const {stop: stopFast} = playSoundsWithDelay(
+    SHORT_DELAY_MS,
+    fastSoundsDuration,
+    0,
+    audioContext,
+    counterRef,
+  );
+
+  const {stop: stopSlower} = playSoundsWithDelay(
     LONG_DELAY_MS,
     SLOWER_SECTION_DURATION_MS,
     fastSoundsDuration,
