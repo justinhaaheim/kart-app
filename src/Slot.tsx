@@ -3,8 +3,9 @@ import './Slot.css';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import {ThemeProvider} from '@mui/material/styles';
+import {ThemeProvider, useTheme} from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import _ from 'lodash';
 import {useEffect, useRef, useState} from 'react';
 
@@ -31,7 +32,9 @@ function getPx(value: number): string {
 
 const SLOT_SIZE_PX = 140;
 const SLOT_MARGIN_PX = 10;
-const SLOT_CONTAINER_SIZE_PX = SLOT_SIZE_PX + SLOT_MARGIN_PX * 2;
+
+const SLOT_SIZE_SMALL_PX = 95;
+const SLOT_MARGIN_SMALL_PX = 6;
 
 const ROUNDS_BEFORE_FINAL_RESULT = 15;
 
@@ -56,18 +59,33 @@ export default function Slot({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const tallBoxRef = useRef<HTMLElement>(null);
 
+  const theme = useTheme();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('sm'));
+
+  const slotSizePx = isLargeScreen ? SLOT_SIZE_PX : SLOT_SIZE_SMALL_PX;
+  const slotMarginPx = isLargeScreen ? SLOT_MARGIN_PX : SLOT_MARGIN_SMALL_PX;
+
+  const slotContainerSizePx = slotSizePx + slotMarginPx * 2;
+
+  const imgMaxHeightPx = Math.floor(slotSizePx * 0.54);
+
   const optionsComponentsUncut = options
     .map((option, _index) => {
       // Return an array of the number of items, and then flatten the resulting array
       return Array.from({length: option.quantity}, () => {
         return (
-          <Stack spacing={0.5}>
+          <Stack
+            spacing={0.5}
+            sx={{alignItems: 'center', justifyContent: 'center'}}>
             <img
               alt={option.label}
               src={option.imageSrc}
               style={{
+                height: 'auto',
                 // border: '1px solid red',
-                maxHeight: '75px',
+                maxHeight: `${imgMaxHeightPx}px`,
+                maxWidth: `${imgMaxHeightPx}px`,
+                width: 'auto',
                 // maxWidth: '75px',
               }}
             />
@@ -142,10 +160,10 @@ export default function Slot({
       <ThemeProvider theme={lightTheme}>
         <Paper
           sx={{
-            height: getPx(SLOT_CONTAINER_SIZE_PX),
+            height: getPx(slotContainerSizePx),
             overflow: 'hidden',
-            padding: getPx(SLOT_MARGIN_PX),
-            width: getPx(SLOT_CONTAINER_SIZE_PX),
+            padding: getPx(slotMarginPx),
+            width: getPx(slotContainerSizePx),
           }}
           variant="outlined">
           <Box
@@ -155,10 +173,10 @@ export default function Slot({
               transform:
                 selectedIndex != null
                   ? `translateY(-${
-                      SLOT_SIZE_PX *
+                      slotSizePx *
                         optionsComponents.length *
                         ROUNDS_BEFORE_FINAL_RESULT +
-                      selectedIndex * SLOT_SIZE_PX
+                      selectedIndex * slotSizePx
                     }px)`
                   : 'translateY(0)',
               transition:
@@ -180,7 +198,7 @@ export default function Slot({
 
                     display: 'flex',
                     // filter: selectedIndex != null ? 'blur(3px)' : 'blur(0)',
-                    height: getPx(SLOT_SIZE_PX),
+                    height: getPx(slotSizePx),
 
                     justifyContent: 'center',
 
@@ -190,7 +208,7 @@ export default function Slot({
                     //     ? `filter ${ANIMATION_DURATION_S} ${BEZIER_CURVE}`
                     //     : 'none',
                     verticalAlign: 'middle',
-                    width: getPx(SLOT_SIZE_PX),
+                    width: getPx(slotSizePx),
                     ...(selectedIndex != null
                       ? {
                           animationDuration: `${animationDuration}s`,

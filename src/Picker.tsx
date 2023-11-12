@@ -29,7 +29,13 @@ export default function Picker() {
   }, []);
 
   return (
-    <Paper sx={{paddingX: 3, paddingY: 5}}>
+    <Paper
+      elevation={10}
+      sx={{
+        margin: {sm: 2, xs: 0.5},
+        paddingX: {sm: 3, xs: 1.5},
+        paddingY: {sm: 5, xs: 4},
+      }}>
       <Stack spacing={3}>
         <Typography variant="h2">The Kart App</Typography>
 
