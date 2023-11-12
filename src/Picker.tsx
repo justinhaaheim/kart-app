@@ -71,6 +71,13 @@ export default function Picker() {
               if (stopSoundsRef.current != null) {
                 stopSoundsRef.current();
               }
+              // const soundEffect = new Audio();
+              // // soundEffect.autoplay = true;
+              // soundEffect.loop = true;
+              // soundEffect.src =
+              //   'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+              // soundEffect.play();
+
               const {stop} = playRouletteSoundSync(
                 BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S,
               );
