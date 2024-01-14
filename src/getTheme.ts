@@ -20,7 +20,8 @@ import {createTheme, responsiveFontSizes} from '@mui/material/styles';
 // const htmlFontSizeObject =
 //   htmlFontSize == null ? {} : {htmlFontSize: htmlFontSize};
 
-const MARIO_KART_BUTTON_YELLOW = '#DBA906';
+// const MARIO_KART_BUTTON_YELLOW = '#DBA906';
+const NINTENDO_RED = 'rgb(230, 0, 18)';
 
 function getTheme({mode}: {mode: 'dark' | 'light'}) {
   return responsiveFontSizes(
@@ -35,11 +36,12 @@ function getTheme({mode}: {mode: 'dark' | 'light'}) {
           // main: '#E3D026',
           // dark: MARIO_KART_BUTTON_YELLOW,
           // light: MARIO_KART_BUTTON_YELLOW,
-          main: MARIO_KART_BUTTON_YELLOW,
+          main: NINTENDO_RED,
         },
       },
       shape: {borderRadius: 12},
       typography: {
+        fontFamily: 'museo-sans, Roboto, sans-serif',
         h1: {
           fontSize: '4rem',
         },

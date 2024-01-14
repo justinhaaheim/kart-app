@@ -111,7 +111,7 @@ export default function Picker() {
 
             <Box>
               <Button
-                color={isAnimating ? 'secondary' : 'primary'}
+                color="primary"
                 onClick={() => {
                   setIsAnimating(true);
                   setCounter((prev) => prev + 1);
