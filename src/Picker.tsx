@@ -44,16 +44,16 @@ export default function Picker() {
         <Paper
           elevation={10}
           sx={{
-            margin: {sm: 2, xs: 1},
-            paddingX: {sm: 3, xs: 1.5},
-            paddingY: {sm: 5, xs: 5},
+            margin: {sm: 3, xs: 2},
+            paddingX: {sm: 3, xs: 1},
+            paddingY: {sm: 8, xs: 6},
           }}>
-          <Stack spacing={3}>
+          <Stack spacing={{sm: 10, xs: 7}}>
             <Box>
               <img
                 alt="The Kart App"
                 src={theKartAppTitle}
-                style={{width: '65%'}}
+                style={{minWidth: '250px', width: '65%'}}
               />
             </Box>
 
@@ -64,7 +64,7 @@ export default function Picker() {
               return (
                 <Box
                   key={idNumber}
-                  sx={{padding: 5, ...(n === 1 ? {display: 'none'} : {})}}>
+                  sx={{padding: 0, ...(n === 1 ? {display: 'none'} : {})}}>
                   <Stack direction="row" justifyContent="center" spacing={3}>
                     <Slot
                       activated={activated}
