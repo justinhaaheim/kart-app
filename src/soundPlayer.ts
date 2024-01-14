@@ -7,6 +7,11 @@ import r6 from './assets/SE_SYS_CourseSelectRoulette6.wav';
 import r7 from './assets/SE_SYS_CourseSelectRoulette7.wav';
 import r8 from './assets/SE_SYS_CourseSelectRoulette8.wav';
 import rDecide from './assets/SE_SYS_CourseSelectRouletteDecide.wav';
+import {
+  bulkAddEventListeners,
+  bulkRemoveEventListeners,
+} from './bulkAddEventListeners';
+import {loadSilentHTMLAudio, playSilentHTMLAudio} from './playSilentHTMLAudio';
 
 type PlayerWithStop = {
   stop: () => void;
@@ -24,9 +29,18 @@ const rouletteSoundUrls = [r1, r2, r3, r4, r5, r6, r7, r8];
 
 // I should probably do this after the page loads, but "I'm lazy", according to github copilot
 const audioContext = new AudioContext();
+console.log('Audio context created. State:', audioContext.state);
+audioContext.addEventListener('statechange', (e) => {
+  console.log('Audio context state changed', audioContext.state, e);
+});
+
+// Load the silent audio to minimize the delay to start playing the silent audio when the user triggers a web audio sound
+loadSilentHTMLAudio();
+
 let rouletteSoundsBuffers: AudioBuffer[] | null = null;
 let rouletteEndSoundBuffer: AudioBuffer | null = null;
 
+// Load the sounds now so they're ready to play when the user triggers a web audio sound
 (async () => {
   rouletteSoundsBuffers = await Promise.all(
     rouletteSoundUrls.map(async (url) => getAudioBuffer(audioContext, url)),
@@ -34,6 +48,20 @@ let rouletteEndSoundBuffer: AudioBuffer | null = null;
   rouletteEndSoundBuffer = await getAudioBuffer(audioContext, rDecide);
   console.log('Sounds loaded');
 })();
+
+const VALID_MEDIA_PLAYBACK_EVENTS = [
+  'click',
+  // 'contextmenu',
+  // 'auxclick',
+  // 'dblclick',
+  'mousedown',
+  'mouseup',
+  'touchend',
+  // Chrome doesn't consider touchstart a valid media playback event
+  // 'touchstart',
+  'keydown',
+  'keyup',
+];
 
 async function getAudioBuffer(
   audioContext: AudioContext,
@@ -93,14 +121,7 @@ function playSoundsWithDelay(
   return {stop: () => nodesScheduled.forEach((node) => node.stop())};
 }
 
-export async function playRouletteSound(
-  durationSeconds: number,
-): Promise<PlayerWithStop> {
-  if (audioContext.state === 'suspended') {
-    console.log('Resuming audio context.');
-    await audioContext.resume();
-  }
-
+function playRouletteSoundBase(durationSeconds: number) {
   const durationMs = durationSeconds * 1000;
 
   const counterRef = {current: 0};
@@ -145,52 +166,70 @@ export async function playRouletteSound(
   };
 }
 
+export async function resumeAudioContext(): Promise<void> {
+  switch (audioContext.state) {
+    case 'running':
+      console.log('Audio context already running.', audioContext.state);
+      return;
+    case 'suspended':
+      console.log('Resuming audio context.');
+      await audioContext.resume();
+      console.log('Audio context resumed.', audioContext.state);
+      return;
+    case 'closed':
+    default:
+      console.error(
+        'Audio context in an unexpected state:',
+        audioContext.state,
+      );
+      return;
+  }
+}
+
+export async function playRouletteSoundAsync(
+  durationSeconds: number,
+): Promise<PlayerWithStop> {
+  await resumeAudioContext();
+  await playSilentHTMLAudio();
+
+  return playRouletteSoundBase(durationSeconds);
+}
+
+// NOTE: This has an issue where the first part of the sound gets cut off since we're not awaiting the audio context to resume
 export function playRouletteSoundSync(durationSeconds: number): PlayerWithStop {
   if (audioContext.state === 'suspended') {
     console.log('Resuming audio context, but not awaiting.');
     audioContext.resume();
   }
 
-  const durationMs = durationSeconds * 1000;
-
-  const counterRef = {current: 0};
-
-  const fastSoundsDuration =
-    durationMs - SLOWER_SECTION_DURATION_MS - FINAL_DELAY_MS;
-
-  const {stop: stopFast} = playSoundsWithDelay(
-    SHORT_DELAY_MS,
-    fastSoundsDuration,
-    0,
-    audioContext,
-    counterRef,
-  );
-
-  const {stop: stopSlower} = playSoundsWithDelay(
-    LONG_DELAY_MS,
-    SLOWER_SECTION_DURATION_MS,
-    fastSoundsDuration,
-    audioContext,
-    counterRef,
-  );
-
-  const rouletteEndSoundBufferNode = new AudioBufferSourceNode(audioContext, {
-    buffer: rouletteEndSoundBuffer,
-  });
-
-  // The final sound should be played right *on* the durationSeconds provided, not before
-
-  scheduleBufferAtTime({
-    audioContext,
-    bufferNode: rouletteEndSoundBufferNode,
-    timeFromNowMs: durationMs,
-  });
-
-  return {
-    stop: () => {
-      stopFast();
-      stopSlower();
-      rouletteEndSoundBufferNode.stop();
-    },
-  };
+  return playRouletteSoundBase(durationSeconds);
 }
+
+// NOTE: At least for Chrome (v120) this does not need to be a synchronous function, as I originally thought.
+// The silent audio playback and resuming of audio context just need to be triggered by a valid media playback event.
+// touchstart is NOT a valid event according to chrome, but touchend is.
+async function prepareForSoundsToBePlayed(): Promise<void> {
+  console.debug(
+    'Valid media playback event triggered. Preparing for sounds to be played...',
+  );
+  // Not sure if we need to wait on the audio context resuming to play the HTML audio. I *think* we don't?
+
+  await Promise.all([resumeAudioContext(), playSilentHTMLAudio()]);
+
+  // We can remove all the event listeners now that the page is ready to play sounds
+  bulkRemoveEventListeners(
+    window,
+    VALID_MEDIA_PLAYBACK_EVENTS,
+    prepareForSoundsToBePlayed,
+  );
+}
+
+function addMediaPlaybackEventListenersToWindow(): void {
+  bulkAddEventListeners(
+    window,
+    VALID_MEDIA_PLAYBACK_EVENTS,
+    prepareForSoundsToBePlayed,
+  );
+}
+
+addMediaPlaybackEventListenersToWindow();
