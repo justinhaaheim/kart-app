@@ -68,7 +68,7 @@ export function loadSilentHTMLAudio() {
     channelTag,
     [
       'play',
-      'playing',
+      // 'playing',
       'pause',
       'ended',
       'durationchange',
