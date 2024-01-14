@@ -89,7 +89,6 @@ export default function Picker() {
 
                     <Slot
                       activated={activated}
-                      // activated={counter !== 0}
                       animationDuration={
                         BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S
                       }
