@@ -1,6 +1,4 @@
-import nullthrows from 'nullthrows';
-
-import debugEvents from './debugEvents';
+import {bulkAddEventListeners} from './bulkAddEventListeners';
 
 let channelTag: HTMLAudioElement;
 
@@ -66,7 +64,7 @@ const silence =
 export function loadSilentHTMLAudio() {
   console.debug('Creating channel tag via js');
   channelTag = new Audio(silence);
-  debugEvents(
+  bulkAddEventListeners(
     channelTag,
     [
       'play',
@@ -78,7 +76,9 @@ export function loadSilentHTMLAudio() {
       'loadeddata',
       'loadstart',
     ],
-    'channelTag',
+    (e) => {
+      console.debug(`[silentHTMLAudio] ${e.type}`, e);
+    },
   );
 
   // var tmp = document.createElement('div');

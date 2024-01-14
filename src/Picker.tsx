@@ -11,7 +11,7 @@ import blueShell from './assets/blueShell.png';
 import greenShell from './assets/greenShell.png';
 import mario from './assets/mario.png';
 import wario from './assets/wario.webp';
-import {playSilentHTMLAudio} from './playHTMLAudio';
+import {playSilentHTMLAudio} from './playSilentHTMLAudio';
 import Slot from './Slot';
 import {
   playRouletteSoundAsync,
@@ -108,17 +108,10 @@ export default function Picker() {
                 console.log('stopping sounds');
                 stopSoundsRef.current();
               }
-              // const soundEffect = new Audio();
-              // // soundEffect.autoplay = true;
-              // soundEffect.loop = true;
-              // soundEffect.src =
-              //   'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-              // soundEffect.play();
 
               playRouletteSoundAsync(
                 BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S,
               ).then(({stop}) => {
-                console.log('setting stop', stop);
                 stopSoundsRef.current = stop;
               });
             }}
