@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import _ from 'lodash';
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 
 import packageJson from '../package.json';
 import blueShell from './assets/blueShell.png';
@@ -13,6 +13,7 @@ import greenShell from './assets/greenShell.png';
 import mario from './assets/mario.png';
 import theKartAppTitle from './assets/theKartAppTitle.png';
 import wario from './assets/wario.webp';
+import {getIntParamFlag} from './getParamFlag';
 import Slot from './Slot';
 import {playRouletteSoundAsync} from './soundPlayer';
 
@@ -21,6 +22,11 @@ const BASE_ANIMATION_DURATION_S = 4;
 // How much longer each successive slot animation should take
 const SLOT_INDEX_DELAY_S = 1;
 
+type Config = {
+  CPU: {hardCPU: number; normalCPU: number};
+  items: {franticItems: number; normalItems: number};
+};
+
 export default function Picker() {
   const [counter, setCounter] = useState(0);
   const [_isAnimating, setIsAnimating] = useState(false);
@@ -28,6 +34,19 @@ export default function Picker() {
 
   const onAnimationEnd = useCallback(() => {
     setIsAnimating(false);
+  }, []);
+
+  const config = useMemo<Config>(() => {
+    const normalItems = getIntParamFlag('normalItems', 2);
+    const franticItems = getIntParamFlag('franticItems', 1);
+    const normalCPU = getIntParamFlag('normalCPU', 3);
+    const hardCPU = getIntParamFlag('hardCPU', 1);
+    const configObj = {
+      CPU: {hardCPU, normalCPU},
+      items: {franticItems, normalItems},
+    };
+    console.log('Probability config:', configObj);
+    return configObj;
   }, []);
 
   return (
@@ -76,13 +95,13 @@ export default function Picker() {
                           emoji: '🙂',
                           imageSrc: greenShell,
                           label: 'Normal',
-                          quantity: 2,
+                          quantity: config.items.normalItems,
                         },
                         {
                           emoji: '😳',
                           imageSrc: blueShell,
                           label: 'Frantic',
-                          quantity: 1,
+                          quantity: config.items.franticItems,
                         },
                       ]}
                     />
@@ -100,13 +119,13 @@ export default function Picker() {
                           emoji: '😌',
                           imageSrc: mario,
                           label: 'Normal',
-                          quantity: 3,
+                          quantity: config.CPU.normalCPU,
                         },
                         {
                           emoji: '🤖',
                           imageSrc: wario,
                           label: 'Hard',
-                          quantity: 1,
+                          quantity: config.CPU.hardCPU,
                         },
                       ]}
                     />
