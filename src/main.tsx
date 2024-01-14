@@ -11,9 +11,12 @@ import {ThemeProvider} from '@mui/material/styles';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
+import packageJson from '../package.json';
 import App from './App.tsx';
 import ErrorBoundary from './ErrorBoundary.ts';
 import getTheme from './getTheme.ts';
+
+console.log('App Version:', packageJson.version);
 
 const darkTheme = getTheme({mode: 'dark'});
 
