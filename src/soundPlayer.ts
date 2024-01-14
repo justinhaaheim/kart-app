@@ -11,10 +11,7 @@ import {
   bulkAddEventListeners,
   bulkRemoveEventListeners,
 } from './bulkAddEventListeners';
-import {
-  loadSilentHTMLAudio,
-  playSilentHTMLAudioAsync,
-} from './playSilentHTMLAudio';
+import {loadSilentHTMLAudio, playSilentHTMLAudio} from './playSilentHTMLAudio';
 
 type PlayerWithStop = {
   stop: () => void;
@@ -60,7 +57,8 @@ const VALID_MEDIA_PLAYBACK_EVENTS = [
   'mousedown',
   'mouseup',
   'touchend',
-  'touchstart',
+  // Chrome doesn't consider touchstart a valid media playback event
+  // 'touchstart',
   'keydown',
   'keyup',
 ];
@@ -192,7 +190,7 @@ export async function playRouletteSoundAsync(
   durationSeconds: number,
 ): Promise<PlayerWithStop> {
   await resumeAudioContext();
-  await playSilentHTMLAudioAsync();
+  await playSilentHTMLAudio();
 
   return playRouletteSoundBase(durationSeconds);
 }
@@ -207,13 +205,16 @@ export function playRouletteSoundSync(durationSeconds: number): PlayerWithStop {
   return playRouletteSoundBase(durationSeconds);
 }
 
+// NOTE: At least for Chrome (v120) this does not need to be a synchronous function, as I originally thought.
+// The silent audio playback and resuming of audio context just need to be triggered by a valid media playback event.
+// touchstart is NOT a valid event according to chrome, but touchend is.
 async function prepareForSoundsToBePlayed(): Promise<void> {
   console.debug(
     'Valid media playback event triggered. Preparing for sounds to be played...',
   );
   // Not sure if we need to wait on the audio context resuming to play the HTML audio. I *think* we don't?
 
-  await Promise.all([resumeAudioContext(), playSilentHTMLAudioAsync()]);
+  await Promise.all([resumeAudioContext(), playSilentHTMLAudio()]);
 
   // We can remove all the event listeners now that the page is ready to play sounds
   bulkRemoveEventListeners(

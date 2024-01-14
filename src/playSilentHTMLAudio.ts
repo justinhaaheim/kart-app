@@ -87,32 +87,13 @@ export function loadSilentHTMLAudio() {
   channelTag.controls = false;
   channelTag.disableRemotePlayback = true; // Airplay like controls on other devices, prevents casting of the tag, doesn't work on modern iOS
   channelTag.preload = 'auto';
-  // channelTag.src = silence;
   channelTag.loop = true;
   channelTag.load();
-  console.log('Created channel tag', channelTag, channelTag.duration);
+  // console.log('Created channel tag', channelTag, channelTag.duration);
 }
 
 // Play a silent HTML audio element to force the Web Audio API sounds to play on the media channel rather than the ringer channel
-export function playSilentHTMLAudio() {
-  // Create a new channel tag if necessary
-  if (!channelTag) {
-    loadSilentHTMLAudio();
-  }
-  // Play the channel tag
-  if (channelTag.paused) {
-    channelTag.play().then(
-      () => {
-        console.debug('playSilentHTMLAudio: play success');
-      },
-      (e) => {
-        console.error('playSilentHTMLAudio: play error', e);
-      },
-    );
-  }
-}
-
-export async function playSilentHTMLAudioAsync(): Promise<void> {
+export function playSilentHTMLAudio(): Promise<void> | undefined {
   // Create a new channel tag if necessary
   if (!channelTag) {
     loadSilentHTMLAudio();
