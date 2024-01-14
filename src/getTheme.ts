@@ -41,7 +41,12 @@ function getTheme({mode}: {mode: 'dark' | 'light'}) {
       },
       shape: {borderRadius: 12},
       typography: {
-        fontFamily: 'museo-sans, Roboto, sans-serif',
+        fontFamily: [
+          'Helvetica Neue',
+          'Roboto',
+          '-apple-system',
+          'sans-serif',
+        ].join(','),
         h1: {
           fontSize: '4rem',
         },
