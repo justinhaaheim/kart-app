@@ -11,6 +11,7 @@ import packageJson from '../package.json';
 import blueShell from './assets/blueShell.png';
 import greenShell from './assets/greenShell.png';
 import mario from './assets/mario.png';
+import theKartAppTitle from './assets/theKartAppTitle.png';
 import wario from './assets/wario.webp';
 import Slot from './Slot';
 import {playRouletteSoundAsync} from './soundPlayer';
@@ -22,7 +23,7 @@ const SLOT_INDEX_DELAY_S = 1;
 
 export default function Picker() {
   const [counter, setCounter] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [_isAnimating, setIsAnimating] = useState(false);
   const stopSoundsRef = useRef<() => void>();
 
   const onAnimationEnd = useCallback(() => {
@@ -45,10 +46,16 @@ export default function Picker() {
           sx={{
             margin: {sm: 2, xs: 1},
             paddingX: {sm: 3, xs: 1.5},
-            paddingY: {sm: 5, xs: 4},
+            paddingY: {sm: 5, xs: 5},
           }}>
           <Stack spacing={3}>
-            <Typography variant="h2">The Kart App</Typography>
+            <Box>
+              <img
+                alt="The Kart App"
+                src={theKartAppTitle}
+                style={{width: '65%'}}
+              />
+            </Box>
 
             {[0, 1].map((n) => {
               const idNumber = counter + n;
