@@ -90,8 +90,8 @@ export default function Slot({
               alt={option.label}
               src={option.imageSrc}
               style={{
+                height: 'auto',
                 // border: '1px solid red',
-                // height: 'auto',
                 maxHeight: `${imgMaxHeightPx}px`,
                 maxWidth: `${imgMaxHeightPx}px`,
                 width: 'auto',
