@@ -11,8 +11,13 @@ import blueShell from './assets/blueShell.png';
 import greenShell from './assets/greenShell.png';
 import mario from './assets/mario.png';
 import wario from './assets/wario.webp';
+import {playSilentHTMLAudio} from './playHTMLAudio';
 import Slot from './Slot';
-import {playRouletteSoundSync} from './soundPlayer';
+import {
+  playRouletteSoundAsync,
+  // playRouletteSoundSync,
+  resumeAudioContext,
+} from './soundPlayer';
 
 const BASE_ANIMATION_DURATION_S = 4;
 
@@ -100,6 +105,7 @@ export default function Picker() {
               setIsAnimating(true);
               setCounter((prev) => prev + 1);
               if (stopSoundsRef.current != null) {
+                console.log('stopping sounds');
                 stopSoundsRef.current();
               }
               // const soundEffect = new Audio();
@@ -109,15 +115,29 @@ export default function Picker() {
               //   'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
               // soundEffect.play();
 
-              const {stop} = playRouletteSoundSync(
+              playRouletteSoundAsync(
                 BASE_ANIMATION_DURATION_S + SLOT_INDEX_DELAY_S,
-              );
-              stopSoundsRef.current = stop;
+              ).then(({stop}) => {
+                console.log('setting stop', stop);
+                stopSoundsRef.current = stop;
+              });
             }}
             size="large"
             sx={{border: '5px solid #fafafa', borderRadius: 1000}}
             variant="contained">
             Let's-a-go!
+          </Button>
+        </Box>
+        <Box>
+          <Button
+            onClick={async () => {
+              await resumeAudioContext();
+              playSilentHTMLAudio();
+            }}
+            size="large"
+            sx={{border: '5px solid #fafafa', borderRadius: 1000}}
+            variant="contained">
+            Resume Audio Context
           </Button>
         </Box>
       </Stack>

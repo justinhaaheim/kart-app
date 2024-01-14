@@ -7,6 +7,12 @@ import r6 from './assets/SE_SYS_CourseSelectRoulette6.wav';
 import r7 from './assets/SE_SYS_CourseSelectRoulette7.wav';
 import r8 from './assets/SE_SYS_CourseSelectRoulette8.wav';
 import rDecide from './assets/SE_SYS_CourseSelectRouletteDecide.wav';
+import {
+  loadSilentHTMLAudio,
+  playSilentHTMLAudio,
+  playSilentHTMLAudioAsync,
+} from './playHTMLAudio';
+import unmute from './unmute';
 
 type PlayerWithStop = {
   stop: () => void;
@@ -24,6 +30,14 @@ const rouletteSoundUrls = [r1, r2, r3, r4, r5, r6, r7, r8];
 
 // I should probably do this after the page loads, but "I'm lazy", according to github copilot
 const audioContext = new AudioContext();
+console.log('Audio context created', audioContext.state);
+audioContext.addEventListener('statechange', (e) => {
+  console.log('Audio context state changed', audioContext.state, e);
+});
+
+// Load the silent audio to minimize the delay to start playing the silent audio when the user triggers a web audio sound
+loadSilentHTMLAudio();
+
 let rouletteSoundsBuffers: AudioBuffer[] | null = null;
 let rouletteEndSoundBuffer: AudioBuffer | null = null;
 
@@ -93,13 +107,9 @@ function playSoundsWithDelay(
   return {stop: () => nodesScheduled.forEach((node) => node.stop())};
 }
 
-export async function playRouletteSound(
-  durationSeconds: number,
-): Promise<PlayerWithStop> {
-  if (audioContext.state === 'suspended') {
-    console.log('Resuming audio context.');
-    await audioContext.resume();
-  }
+function playRouletteSoundBase(durationSeconds: number) {
+  // Play a silent HTML audio element to force the Web Audio API sounds to play on the media channel rather than the ringer channel
+  // playSilentHTMLAudio();
 
   const durationMs = durationSeconds * 1000;
 
@@ -145,52 +155,32 @@ export async function playRouletteSound(
   };
 }
 
+export async function resumeAudioContext(): Promise<void> {
+  if (audioContext.state === 'suspended') {
+    console.log('Resuming audio context.');
+    await audioContext.resume();
+    console.log('Audio context resumed.', audioContext.state);
+    return;
+  }
+  console.log('Audio context already resumed.', audioContext.state);
+}
+
+export async function playRouletteSoundAsync(
+  durationSeconds: number,
+): Promise<PlayerWithStop> {
+  // await resumeAudioContext();
+  // await playSilentHTMLAudioAsync();
+
+  await Promise.all([playSilentHTMLAudioAsync(), resumeAudioContext()]);
+
+  return playRouletteSoundBase(durationSeconds);
+}
+
 export function playRouletteSoundSync(durationSeconds: number): PlayerWithStop {
   if (audioContext.state === 'suspended') {
     console.log('Resuming audio context, but not awaiting.');
     audioContext.resume();
   }
 
-  const durationMs = durationSeconds * 1000;
-
-  const counterRef = {current: 0};
-
-  const fastSoundsDuration =
-    durationMs - SLOWER_SECTION_DURATION_MS - FINAL_DELAY_MS;
-
-  const {stop: stopFast} = playSoundsWithDelay(
-    SHORT_DELAY_MS,
-    fastSoundsDuration,
-    0,
-    audioContext,
-    counterRef,
-  );
-
-  const {stop: stopSlower} = playSoundsWithDelay(
-    LONG_DELAY_MS,
-    SLOWER_SECTION_DURATION_MS,
-    fastSoundsDuration,
-    audioContext,
-    counterRef,
-  );
-
-  const rouletteEndSoundBufferNode = new AudioBufferSourceNode(audioContext, {
-    buffer: rouletteEndSoundBuffer,
-  });
-
-  // The final sound should be played right *on* the durationSeconds provided, not before
-
-  scheduleBufferAtTime({
-    audioContext,
-    bufferNode: rouletteEndSoundBufferNode,
-    timeFromNowMs: durationMs,
-  });
-
-  return {
-    stop: () => {
-      stopFast();
-      stopSlower();
-      rouletteEndSoundBufferNode.stop();
-    },
-  };
+  return playRouletteSoundBase(durationSeconds);
 }
