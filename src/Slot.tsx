@@ -72,7 +72,7 @@ export default function Slot({
    * This re-animating will happen if the user's browser changes size and our media query above (isLargeScreen)
    * changes, which causes a partial re-animation as the slot adapts to the new sizes.
    */
-  const transitionEnabled = selectedIndex != null; // && status !== 'ended';
+  const transitionEnabled = selectedIndex != null && status !== 'ended';
 
   const slotContainerSizePx = slotSizePx + slotMarginPx * 2;
 
