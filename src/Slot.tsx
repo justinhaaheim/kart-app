@@ -65,6 +65,15 @@ export default function Slot({
   const slotSizePx = isLargeScreen ? SLOT_SIZE_PX : SLOT_SIZE_SMALL_PX;
   const slotMarginPx = isLargeScreen ? SLOT_MARGIN_PX : SLOT_MARGIN_SMALL_PX;
 
+  /**
+   * Once the animation is complete we want to disable the transition altogether because
+   * we don't want anything re-animating after the slot has landed on its final position.
+   *
+   * This re-animating will happen if the user's browser changes size and our media query above (isLargeScreen)
+   * changes, which causes a partial re-animation as the slot adapts to the new sizes.
+   */
+  const transitionEnabled = selectedIndex != null; // && status !== 'ended';
+
   const slotContainerSizePx = slotSizePx + slotMarginPx * 2;
 
   const imgMaxHeightPx = Math.floor(slotSizePx * 0.54);
@@ -179,10 +188,9 @@ export default function Slot({
                       selectedIndex * slotSizePx
                     }px)`
                   : 'translateY(0)',
-              transition:
-                selectedIndex != null
-                  ? `transform ${animationDuration}s ${BEZIER_CURVE}`
-                  : 'none',
+              transition: transitionEnabled
+                ? `transform ${animationDuration}s ${BEZIER_CURVE}`
+                : 'none',
             }}>
             {Array.from({length: ROUNDS_BEFORE_FINAL_RESULT + 1})
               .fill(optionsComponents)
